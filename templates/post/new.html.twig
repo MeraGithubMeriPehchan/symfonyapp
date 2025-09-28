@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add New Post{% endblock %}
+
+{% block body %}
+<div class="container mt-4" style="max-width: 600px;">
+    <h1>Add New Post</h1>
+
+    {{ form_start(form) }}
+
+    <div class="mb-3">
+        {{ form_label(form.title) }}
+        {{ form_widget(form.title) }}
+        {{ form_errors(form.title) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_label(form.body) }}
+        {{ form_widget(form.body) }}
+        {{ form_errors(form.body) }}
+    </div>
+
+    <div class="mb-3">
+        {{ form_widget(form.save) }}
+        <a href="{{ path('app_posts') }}" class="btn btn-secondary ms-2">Cancel</a>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+{% endblock %}

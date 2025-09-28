@@ -86,7 +86,20 @@ class ApiController extends AbstractController
     public function newPost(Request $request, EntityManagerInterface $em): Response
     {
         $post = new Post();
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createFormBuilder($post)
+        ->add('title', TextType::class, [
+            'label' => 'Title',
+            'attr' => ['class' => 'form-control']
+        ])
+        ->add('body', TextareaType::class, [
+            'label' => 'Content',
+            'attr' => ['class' => 'form-control', 'rows' => 5]
+        ])
+        ->add('save', SubmitType::class, [
+            'label' => 'Create',
+            'attr' => ['class' => 'btn btn-success mt-2']
+        ])
+        ->getForm();
 
         $form->handleRequest($request);
 
@@ -99,8 +112,8 @@ class ApiController extends AbstractController
             return $this->redirectToRoute('app_posts');
         }
 
-        return $this->render('api/new.html.twig', [
-            'postForm' => $form->createView(),
+        return $this->render('post/new.html.twig', [
+            'form' => $form->createView(),
         ]);
     }
 
