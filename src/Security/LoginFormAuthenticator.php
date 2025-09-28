@@ -49,13 +49,11 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?RedirectResponse
     {
-        // prevent redirect loop
         $targetPath = $this->getTargetPath($request->getSession(), $firewallName);
         if ($targetPath) {
             return new RedirectResponse($targetPath);
         }
 
-        // redirect logged-in admin to posts
         return new RedirectResponse($this->router->generate('app_posts'));
     }
 
