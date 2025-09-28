@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Post;
+use App\Form\PostType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpClient\HttpClient;
@@ -13,6 +14,28 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ApiController extends AbstractController
 {
+    #[Route('/posts/new', name: 'app_post_new')]
+    public function newPost(Request $request, EntityManagerInterface $em): Response
+    {
+        $post = new Post();
+        $form = $this->createForm(PostType::class, $post);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($post);
+            $em->flush();
+
+            $this->addFlash('success', 'Post created successfully!');
+
+            return $this->redirectToRoute('app_posts');
+        }
+
+        return $this->render('api/new.html.twig', [
+            'postForm' => $form->createView(),
+        ]);
+    }
+
     #[Route('/posts/save', name: 'app_posts_save')]
     public function savePosts(EntityManagerInterface $entityManager): Response
     {

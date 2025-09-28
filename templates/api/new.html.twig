@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add New Post{% endblock %}
+
+{% block body %}
+<h1>Add New Post</h1>
+
+{{ form_start(postForm) }}
+    {{ form_row(postForm.apiId) }}
+    {{ form_row(postForm.title) }}
+    {{ form_row(postForm.body) }}
+    <button class="btn">Save</button>
+{{ form_end(postForm) }}
+
+<a href="{{ path('app_posts') }}">Back to posts</a>
+{% endblock %}
