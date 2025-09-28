@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Post{% endblock %}
+
+{% block body %}
+<h1>Edit Post</h1>
+
+{{ form_start(postForm) }}
+    {{ form_row(postForm.apiId) }}
+    {{ form_row(postForm.title) }}
+    {{ form_row(postForm.body) }}
+    <button class="btn">Update</button>
+{{ form_end(postForm) }}
+
+<a href="{{ path('app_posts') }}">Back to posts</a>
+{% endblock %}

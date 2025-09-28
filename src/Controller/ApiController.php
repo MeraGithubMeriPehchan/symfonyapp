@@ -11,9 +11,58 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class ApiController extends AbstractController
 {
+    #[Route('/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', [
+            'last_username' => $lastUsername,
+            'error' => $error,
+        ]);
+    }
+
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(): void
+    {
+        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+    
+    #[Route('/posts/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
+    public function deletePost(Post $post, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+            $em->remove($post);
+            $em->flush();
+            $this->addFlash('success', 'Post deleted successfully!');
+        }
+
+        return $this->redirectToRoute('app_posts');
+    }
+
+    #[Route('/posts/{id}/edit', name: 'app_post_edit')]
+    public function editPost(Post $post, Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush(); // no need to persist, already managed
+            $this->addFlash('success', 'Post updated successfully!');
+            return $this->redirectToRoute('app_posts');
+        }
+
+        return $this->render('api/edit.html.twig', [
+            'postForm' => $form->createView(),
+            'post' => $post,
+        ]);
+    }
+
     #[Route('/posts/new', name: 'app_post_new')]
     public function newPost(Request $request, EntityManagerInterface $em): Response
     {
