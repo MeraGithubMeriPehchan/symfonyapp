@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Saved Posts{% endblock %}
+
+{% block body %}
+    <h1>Posts from Database</h1>
+
+    {% for post in pagination %}
+    <li>
+        <strong>{{ post.title }}</strong><br>
+        {{ post.body }}
+    </li>
+    {% endfor %}
+
+    <div class="navigation">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+{% endblock %}
