@@ -12,9 +12,18 @@ use Symfony\Component\Routing\Annotation\Route;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class ApiController extends AbstractController
 {
+    #[Route('/profile', name: 'app_profile')]
+    public function profile(): Response
+    {
+        return $this->render('profile/index.html.twig');
+    }
+
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -50,19 +59,25 @@ class ApiController extends AbstractController
     }
 
     #[Route('/posts/{id}/edit', name: 'app_post_edit')]
-    public function editPost(Post $post, Request $request, EntityManagerInterface $em): Response
+    public function editPost(Request $request, Post $post, EntityManagerInterface $em): Response
     {
-        $form = $this->createForm(PostType::class, $post);
+        $form = $this->createFormBuilder($post)
+            ->add('title', TextType::class, ['label' => 'Title', 'attr' => ['class' => 'form-control']])
+            ->add('body', TextareaType::class, ['label' => 'Content', 'attr' => ['class' => 'form-control', 'rows' => 5]])
+            ->add('save', SubmitType::class, ['label' => 'Update', 'attr' => ['class' => 'btn btn-primary mt-2']])
+            ->getForm();
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em->flush(); // no need to persist, already managed
-            $this->addFlash('success', 'Post updated successfully!');
+            $em->persist($post);
+            $em->flush();
+
             return $this->redirectToRoute('app_posts');
         }
 
-        return $this->render('api/edit.html.twig', [
-            'postForm' => $form->createView(),
+        return $this->render('post/edit.html.twig', [
+            'form' => $form->createView(),
             'post' => $post,
         ]);
     }
