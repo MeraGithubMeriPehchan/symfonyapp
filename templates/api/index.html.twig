@@ -3,17 +3,25 @@
 {% block title %}Saved Posts{% endblock %}
 
 {% block body %}
-    <h1>Posts from Database</h1>
+    <form method="get" action="{{ path('app_posts') }}">
+    <input type="text" name="q" placeholder="Search by title" value="{{ searchTerm }}">
+    <button type="submit">Search</button>
+    <a href="{{ path('app_posts') }}">Clear</a>
+</form>
 
+<ul>
     {% for post in pagination %}
-    <li>
-        <strong>{{ post.title }}</strong><br>
-        {{ post.body }}
-    </li>
+        <li>
+            <strong>{{ post.title }}</strong><br>
+            {{ post.body }}
+        </li>
+    {% else %}
+        <li>No posts found.</li>
     {% endfor %}
+</ul>
 
-    <div class="navigation">
-        {{ knp_pagination_render(pagination) }}
-    </div>
+<div class="navigation">
+    {{ knp_pagination_render(pagination) }}
+</div>
 
 {% endblock %}

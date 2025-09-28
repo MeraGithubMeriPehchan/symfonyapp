@@ -43,8 +43,18 @@ class ApiController extends AbstractController
     #[Route('/posts', name: 'app_posts')]
     public function listPosts(EntityManagerInterface $em, PaginatorInterface $paginator, Request $request): Response
     {
-        $query = $em->getRepository(Post::class)->createQueryBuilder('p')->getQuery();
+        $searchTerm = $request->query->get('q', ''); // get search keyword
+        // Build query
+        $qb = $em->getRepository(Post::class)->createQueryBuilder('p');
 
+        if ($searchTerm) {
+            $qb->where('p.title LIKE :search')
+            ->setParameter('search', '%' . $searchTerm . '%');
+        }
+
+        $query = $qb->getQuery();
+
+        // Paginate the results
         $pagination = $paginator->paginate(
             $query,
             $request->query->getInt('page', 1),
@@ -53,6 +63,7 @@ class ApiController extends AbstractController
 
         return $this->render('api/index.html.twig', [
             'pagination' => $pagination,
+            'searchTerm' => $searchTerm,
         ]);
     }
 
